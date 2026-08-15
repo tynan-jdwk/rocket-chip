@@ -849,7 +849,7 @@ class CSRFile(
   Seq(CSRs.mimpid, CSRs.marchid, CSRs.mvendorid, CSRs.mconfigptr).foreach(id => read_mapping.getOrElseUpdate(id, 0.U))
 
   val decoded_addr = {
-    val addr = Cat(io.status.v, io.rw.addr)
+    val addr = io.rw.addr
     val pats = for (((k, _), i) <- read_mapping.zipWithIndex)
       yield (BitPat(k.U), (0 until read_mapping.size).map(j => BitPat((i == j).B)))
     val decoded = DecodeLogic(addr, Seq.fill(read_mapping.size)(X), pats)

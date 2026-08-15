@@ -886,7 +886,7 @@ class FPU(cfg: FPUParams)(implicit p: Parameters) extends FPUModule()(p) {
 
   val ifpu = Module(new IntToFP(cfg.ifpuLatency))
   ifpu.io.in.valid := req_valid && ex_ctrl.fromint
-  ifpu.io.in.bits := fpiu.io.in.bits
+  (ifpu.io.in.bits: Data).unsafe :<= (fpiu.io.in.bits: Data).unsafe
   ifpu.io.in.bits.in1 :<= Mux(ex_cp_valid, io.cp_req.bits.in1, io.fromint_data).squeeze
 
   val fpmu = Module(new FPToFP(cfg.fpmuLatency))

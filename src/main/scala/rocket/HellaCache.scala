@@ -303,7 +303,7 @@ class L1Metadata(implicit p: Parameters) extends L1HellaCacheBundle()(p) {
 object L1Metadata {
   def apply(tag: Bits, coh: ClientMetadata)(implicit p: Parameters) = {
     val meta = Wire(new L1Metadata)
-    meta.tag := tag
+    meta.tag :<= tag.asUInt.squeeze
     meta.coh := coh
     meta
   }

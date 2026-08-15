@@ -67,7 +67,7 @@ class TLSourceShrinker(maxInFlight: Int)(implicit p: Parameters) extends LazyMod
         val block = a_first && full
         in.a.ready := out.a.ready && !block
         out.a.valid := in.a.valid && !block
-        out.a.bits := in.a.bits
+        out.a.bits :<= in.a.bits.squeezeAll
         out.a.bits.source := nextFree holdUnless a_first
 
         val bypass = (edgeOut.manager.minLatency == 0).B && in.a.valid && !full && a_first && nextFree === out.d.bits.source

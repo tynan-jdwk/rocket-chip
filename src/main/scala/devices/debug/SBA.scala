@@ -237,7 +237,7 @@ object SystemBusAccessModule
     SBCSRdData.sbaccess16  := (cfg.maxSupportedSBAccess >=  16).B
     SBCSRdData.sbaccess8   := (cfg.maxSupportedSBAccess >=   8).B
     SBCSRdData.sbbusy      := sbBusy
-    SBCSRdData.sberror     := sbErrorReg.asUInt
+    SBCSRdData.sberror     :<= sbErrorReg.asUInt.squeeze
     
     when (~dmAuthenticated) {    // Read value must be 0 if not authenticated
       SBCSRdData := 0.U.asTypeOf(new SBCSFields())

@@ -72,7 +72,7 @@ case class TLRegisterNode(
     val params = RegMapperParams(log2Up(size/beatBytes), beatBytes, fields)
     val in = Wire(Decoupled(new RegMapperInput(params)))
     in.bits.read  := a.bits.opcode === TLMessages.Get
-    in.bits.index := edge.addr_hi(a.bits)
+    in.bits.index :<= edge.addr_hi(a.bits).squeeze
     in.bits.data  := a.bits.data
     in.bits.mask  := a.bits.mask
     Connectable.waiveUnmatched(in.bits.extra, a.bits.echo) match {

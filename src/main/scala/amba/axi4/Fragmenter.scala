@@ -132,7 +132,7 @@ class AXI4Fragmenter()(implicit p: Parameters) extends LazyModule
         when (out.fire) {
           busy := !last
           r_addr := mux_addr
-          r_len  := len - beats
+          r_len  :<= (len - beats).squeeze
         }
 
         (out, last, beats)

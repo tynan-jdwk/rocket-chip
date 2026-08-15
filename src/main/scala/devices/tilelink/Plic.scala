@@ -352,7 +352,7 @@ class PLICFanIn(nDevices: Int, prioBits: Int) extends Module {
 
   val effectivePriority = (1.U << prioBits) +: (io.ip.asBools zip io.prio).map { case (p, x) => Cat(p, x) }
   val (maxPri, maxDev) = findMax(effectivePriority)
-  io.max := maxPri // strips the always-constant high '1' bit
+  io.max :<= maxPri.squeeze // strips the always-constant high '1' bit
   io.dev := maxDev
 }
 

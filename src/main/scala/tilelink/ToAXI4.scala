@@ -172,7 +172,7 @@ class TLToAXI4(val combinational: Boolean = true, val adapterName: Option[String
       arw.id    := sourceTable(a_source)
       arw.addr  := a_address
       arw.len   := UIntToOH1(a_size, AXI4Parameters.lenBits + log2Ceil(beatBytes)) >> log2Ceil(beatBytes)
-      arw.size  := Mux(a_size >= maxSize, maxSize, a_size)
+      arw.size  :<= Mux(a_size >= maxSize, maxSize, a_size).squeeze
       arw.burst := AXI4Parameters.BURST_INCR
       arw.lock  := 0.U // not exclusive (LR/SC unsupported b/c no forward progress guarantee)
       arw.cache := 0.U // do not allow AXI to modify our transactions

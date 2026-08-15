@@ -153,7 +153,7 @@ object RegField
     val oldBytes = VecInit.tabulate(numBytes) { i => pad(8*(i+1)-1, 8*i) }
     val newBytes = WireDefault(oldBytes)
     val valids = WireDefault(VecInit.fill(numBytes) { false.B })
-    when (valids.reduce(_ || _)) { reg := newBytes.asUInt }
+    when (valids.reduce(_ || _)) { reg :<= newBytes.asUInt.squeeze }
 
     def wrFn(i: Int): RegWriteFn = RegWriteFn((valid, data) => {
       valids(i) := valid

@@ -209,5 +209,5 @@ class PipelinedMultiplier(width: Int, latency: Int, nXpr: Int = 32) extends Modu
   io.resp.valid := resp.valid
   io.resp.bits.tag := resp.bits.tag
   io.resp.bits.data := Pipe(in.valid, muxed, latency-1).bits
-  io.resp.bits.full_data := Pipe(in.valid, prod, latency-1).bits.asUInt
+  io.resp.bits.full_data :<= Pipe(in.valid, prod, latency-1).bits.asUInt.squeeze
 }

@@ -796,7 +796,7 @@ class PTW(n: Int)(implicit edge: TLEdgeOut, p: Parameters) extends CoreModule()(
   private def makeHypervisorRootPTE(hgatp: PTBR, vpn: UInt, default: PTE) = {
     val count = pgLevels.U - minPgLevels.U - hgatp.additionalPgLevels
     val idxs = (0 to pgLevels-minPgLevels).map(i => (vpn >> (pgLevels-i)*pgLevelBits))
-    val lsbs = WireDefault(UInt(maxHypervisorExtraAddrBits.W), idxs(count))
+    val lsbs = WireDefault(UInt(maxHypervisorExtraAddrBits.W), idxs(count).pad(maxHypervisorExtraAddrBits)(maxHypervisorExtraAddrBits - 1, 0))
     val pte = WireDefault(default)
     pte.ppn := Cat(hgatp.ppn >> maxHypervisorExtraAddrBits, lsbs)
     pte

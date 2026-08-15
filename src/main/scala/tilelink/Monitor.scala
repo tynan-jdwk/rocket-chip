@@ -648,11 +648,11 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
     a_sizes_set_interm.suggestName("a_sizes_set_interm")
 
     when (bundle.a.valid && a_first && edge.isRequest(bundle.a.bits)) {
-      a_set_wo_ready := UIntToOH(bundle.a.bits.source)
+      a_set_wo_ready :<= UIntToOH(bundle.a.bits.source, edge.client.endSourceId)
     }
 
     when (bundle.a.fire && a_first && edge.isRequest(bundle.a.bits)) {
-      a_set                := UIntToOH(bundle.a.bits.source)
+      a_set                :<= UIntToOH(bundle.a.bits.source, edge.client.endSourceId)
       a_opcodes_set_interm := (bundle.a.bits.opcode << 1.U) | 1.U
       a_sizes_set_interm   := (bundle.a.bits.size << 1.U) | 1.U
       a_opcodes_set        := (a_opcodes_set_interm) << (bundle.a.bits.source << log_a_opcode_bus_size.U)
@@ -671,11 +671,11 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     val d_release_ack = bundle.d.bits.opcode === TLMessages.ReleaseAck
     when (bundle.d.valid && d_first && edge.isResponse(bundle.d.bits) && !d_release_ack) {
-      d_clr_wo_ready := UIntToOH(bundle.d.bits.source)
+      d_clr_wo_ready :<= UIntToOH(bundle.d.bits.source, edge.client.endSourceId)
     }
 
     when (bundle.d.fire && d_first && edge.isResponse(bundle.d.bits) && !d_release_ack) {
-      d_clr         := UIntToOH(bundle.d.bits.source)
+      d_clr         :<= UIntToOH(bundle.d.bits.source, edge.client.endSourceId)
       d_opcodes_clr := size_to_numfullbits(1.U << log_a_opcode_bus_size.U) << (bundle.d.bits.source << log_a_opcode_bus_size.U)
       d_sizes_clr   := size_to_numfullbits(1.U << log_a_size_bus_size.U) << (bundle.d.bits.source << log_a_size_bus_size.U)
     }
@@ -756,11 +756,11 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
     c_sizes_set_interm.suggestName("c_sizes_set_interm")
 
     when (bundle.c.valid && c_first && edge.isRequest(bundle.c.bits)) {
-      c_set_wo_ready := UIntToOH(bundle.c.bits.source)
+      c_set_wo_ready :<= UIntToOH(bundle.c.bits.source, edge.client.endSourceId)
     }
 
     when (bundle.c.fire && c_first && edge.isRequest(bundle.c.bits)) {
-      c_set                := UIntToOH(bundle.c.bits.source)
+      c_set                :<= UIntToOH(bundle.c.bits.source, edge.client.endSourceId)
       c_opcodes_set_interm := (bundle.c.bits.opcode << 1.U) | 1.U
       c_sizes_set_interm   := (bundle.c.bits.size << 1.U) | 1.U
       c_opcodes_set        := (c_opcodes_set_interm) << (bundle.c.bits.source << log_c_opcode_bus_size.U)
@@ -781,11 +781,11 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     val d_release_ack = bundle.d.bits.opcode === TLMessages.ReleaseAck
     when (bundle.d.valid && d_first && edge.isResponse(bundle.d.bits) && d_release_ack) {
-      d_clr_wo_ready := UIntToOH(bundle.d.bits.source)
+      d_clr_wo_ready :<= UIntToOH(bundle.d.bits.source, edge.client.endSourceId)
     }
 
     when (bundle.d.fire && d_first && edge.isResponse(bundle.d.bits) && d_release_ack) {
-      d_clr         := UIntToOH(bundle.d.bits.source)
+      d_clr         :<= UIntToOH(bundle.d.bits.source, edge.client.endSourceId)
       d_opcodes_clr := size_to_numfullbits(1.U << log_c_opcode_bus_size.U) << (bundle.d.bits.source << log_c_opcode_bus_size.U)
       d_sizes_clr   := size_to_numfullbits(1.U << log_c_size_bus_size.U) << (bundle.d.bits.source << log_c_size_bus_size.U)
     }
@@ -831,13 +831,13 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     val d_set = WireInit(0.U(edge.manager.endSinkId.W))
     when (bundle.d.fire && d_first && edge.isRequest(bundle.d.bits)) {
-      d_set := UIntToOH(bundle.d.bits.sink)
+      d_set :<= UIntToOH(bundle.d.bits.sink, edge.manager.endSinkId)
       assume(!inflight(bundle.d.bits.sink), "'D' channel re-used a sink ID" + extra)
     }
 
     val e_clr = WireInit(0.U(edge.manager.endSinkId.W))
     when (bundle.e.fire && e_first && edge.isResponse(bundle.e.bits)) {
-      e_clr := UIntToOH(bundle.e.bits.sink)
+      e_clr :<= UIntToOH(bundle.e.bits.sink, edge.manager.endSinkId)
       monAssert((d_set | inflight)(bundle.e.bits.sink), "'E' channel acknowledged for nothing inflight" + extra)
     }
 

@@ -428,7 +428,7 @@ class PTW(n: Int)(implicit edge: TLEdgeOut, p: Parameters) extends CoreModule()(
     val r_l2_plru_way = Reg(UInt(log2Ceil(coreParams.nL2TLBWays max 1).W))
     r_valid_vec_q := r_valid_vec
     // replacement way
-    r_l2_plru_way := (if (coreParams.nL2TLBWays > 1) l2_plru.way(r_idx) else 0.U)
+    r_l2_plru_way :<= (if (coreParams.nL2TLBWays > 1) l2_plru.way(r_idx) else 0.U(0.W))
     // refill with r_pte(leaf pte)
     when (l2_refill && !invalidated) {
       val entry = Wire(new L2TLBEntry(nL2TLBSets))

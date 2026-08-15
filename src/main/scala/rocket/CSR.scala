@@ -627,8 +627,8 @@ class CSRFile(
   io.interrupt := (anyInterrupt && !io.singleStep || reg_singleStepped) && !(reg_debug || io.status.cease)
   io.interrupt_cause := interruptCause
   io.bp := reg_bp take nBreakpoints
-  io.mcontext := reg_mcontext.getOrElse(0.U)
-  io.scontext := reg_scontext.getOrElse(0.U)
+  io.mcontext :<= reg_mcontext.getOrElse(0.U(0.W))
+  io.scontext :<= reg_scontext.getOrElse(0.U(0.W))
   io.fiom := (reg_mstatus.prv < PRV.M.U && reg_menvcfg.fiom) || (reg_mstatus.prv < PRV.S.U && reg_senvcfg.fiom) || (reg_mstatus.v && reg_henvcfg.fiom)
   io.pmp := reg_pmp.map(PMP(_))
 

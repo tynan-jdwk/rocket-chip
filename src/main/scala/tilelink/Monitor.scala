@@ -633,11 +633,11 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     val a_opcode_lookup = WireInit(0.U((a_opcode_bus_size - 1).W))
     a_opcode_lookup.suggestName("a_opcode_lookup")
-    a_opcode_lookup := ((inflight_opcodes) >> (bundle.d.bits.source << log_a_opcode_bus_size.U) & size_to_numfullbits(1.U << log_a_opcode_bus_size.U)) >> 1.U
+    a_opcode_lookup :<= (((inflight_opcodes) >> (bundle.d.bits.source << log_a_opcode_bus_size) & size_to_numfullbits(1.U << log_a_opcode_bus_size)) >> 1).squeeze
 
     val a_size_lookup = WireInit(0.U((1 << log_a_size_bus_size).W))
     a_size_lookup.suggestName("a_size_lookup")
-    a_size_lookup := ((inflight_sizes) >> (bundle.d.bits.source << log_a_size_bus_size.U) & size_to_numfullbits(1.U << log_a_size_bus_size.U)) >> 1.U
+    a_size_lookup :<= (((inflight_sizes) >> (bundle.d.bits.source << log_a_size_bus_size) & size_to_numfullbits(1.U << log_a_size_bus_size)) >> 1).squeeze
 
     val responseMap             = VecInit(Seq(TLMessages.AccessAck, TLMessages.AccessAck, TLMessages.AccessAckData, TLMessages.AccessAckData, TLMessages.AccessAckData, TLMessages.HintAck, TLMessages.Grant,     TLMessages.Grant))
     val responseMapSecondOption = VecInit(Seq(TLMessages.AccessAck, TLMessages.AccessAck, TLMessages.AccessAckData, TLMessages.AccessAckData, TLMessages.AccessAckData, TLMessages.HintAck, TLMessages.GrantData, TLMessages.Grant))
@@ -655,8 +655,8 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
       a_set                :<= UIntToOH(bundle.a.bits.source, edge.client.endSourceId)
       a_opcodes_set_interm := (bundle.a.bits.opcode << 1.U) | 1.U
       a_sizes_set_interm   := (bundle.a.bits.size << 1.U) | 1.U
-      a_opcodes_set        := (a_opcodes_set_interm) << (bundle.a.bits.source << log_a_opcode_bus_size.U)
-      a_sizes_set          := (a_sizes_set_interm) << (bundle.a.bits.source << log_a_size_bus_size.U)
+      a_opcodes_set        :<= ((a_opcodes_set_interm) << (bundle.a.bits.source << log_a_opcode_bus_size)).squeeze
+      a_sizes_set          :<= ((a_sizes_set_interm) << (bundle.a.bits.source << log_a_size_bus_size)).squeeze
       monAssert(!inflight(bundle.a.bits.source), "'A' channel re-used a source ID" + extra)
     }
 
@@ -676,8 +676,8 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     when (bundle.d.fire && d_first && edge.isResponse(bundle.d.bits) && !d_release_ack) {
       d_clr         :<= UIntToOH(bundle.d.bits.source, edge.client.endSourceId)
-      d_opcodes_clr := size_to_numfullbits(1.U << log_a_opcode_bus_size.U) << (bundle.d.bits.source << log_a_opcode_bus_size.U)
-      d_sizes_clr   := size_to_numfullbits(1.U << log_a_size_bus_size.U) << (bundle.d.bits.source << log_a_size_bus_size.U)
+      d_opcodes_clr :<= (size_to_numfullbits(1.U << log_a_opcode_bus_size) << (bundle.d.bits.source << log_a_opcode_bus_size)).squeeze
+      d_sizes_clr   :<= (size_to_numfullbits(1.U << log_a_size_bus_size) << (bundle.d.bits.source << log_a_size_bus_size)).squeeze
     }
     when (bundle.d.valid && d_first && edge.isResponse(bundle.d.bits) && !d_release_ack) {
       val same_cycle_resp = bundle.a.valid && a_first && edge.isRequest(bundle.a.bits) && (bundle.a.bits.source === bundle.d.bits.source)
@@ -745,8 +745,8 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     val c_opcode_lookup = WireInit(0.U((1 << log_c_opcode_bus_size).W))
     val c_size_lookup   = WireInit(0.U((1 << log_c_size_bus_size).W))
-    c_opcode_lookup := ((inflight_opcodes) >> (bundle.d.bits.source << log_c_opcode_bus_size.U) & size_to_numfullbits(1.U << log_c_opcode_bus_size.U)) >> 1.U
-    c_size_lookup   := ((inflight_sizes) >> (bundle.d.bits.source << log_c_size_bus_size.U) & size_to_numfullbits(1.U << log_c_size_bus_size.U)) >> 1.U
+    c_opcode_lookup :<= (((inflight_opcodes) >> (bundle.d.bits.source << log_c_opcode_bus_size) & size_to_numfullbits(1.U << log_c_opcode_bus_size)) >> 1).squeeze
+    c_size_lookup   :<= (((inflight_sizes) >> (bundle.d.bits.source << log_c_size_bus_size) & size_to_numfullbits(1.U << log_c_size_bus_size)) >> 1).squeeze
     c_opcode_lookup.suggestName("c_opcode_lookup")
     c_size_lookup.suggestName("c_size_lookup")
 
@@ -763,8 +763,8 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
       c_set                :<= UIntToOH(bundle.c.bits.source, edge.client.endSourceId)
       c_opcodes_set_interm := (bundle.c.bits.opcode << 1.U) | 1.U
       c_sizes_set_interm   := (bundle.c.bits.size << 1.U) | 1.U
-      c_opcodes_set        := (c_opcodes_set_interm) << (bundle.c.bits.source << log_c_opcode_bus_size.U)
-      c_sizes_set          := (c_sizes_set_interm) << (bundle.c.bits.source << log_c_size_bus_size.U)
+      c_opcodes_set        :<= ((c_opcodes_set_interm) << (bundle.c.bits.source << log_c_opcode_bus_size)).squeeze
+      c_sizes_set          :<= ((c_sizes_set_interm) << (bundle.c.bits.source << log_c_size_bus_size)).squeeze
       monAssert(!inflight(bundle.c.bits.source), "'C' channel re-used a source ID" + extra)
     }
 
@@ -786,8 +786,8 @@ class TLMonitor(args: TLMonitorArgs, monitorDir: MonitorDirection = MonitorDirec
 
     when (bundle.d.fire && d_first && edge.isResponse(bundle.d.bits) && d_release_ack) {
       d_clr         :<= UIntToOH(bundle.d.bits.source, edge.client.endSourceId)
-      d_opcodes_clr := size_to_numfullbits(1.U << log_c_opcode_bus_size.U) << (bundle.d.bits.source << log_c_opcode_bus_size.U)
-      d_sizes_clr   := size_to_numfullbits(1.U << log_c_size_bus_size.U) << (bundle.d.bits.source << log_c_size_bus_size.U)
+      d_opcodes_clr :<= (size_to_numfullbits(1.U << log_c_opcode_bus_size) << (bundle.d.bits.source << log_c_opcode_bus_size)).squeeze
+      d_sizes_clr   :<= (size_to_numfullbits(1.U << log_c_size_bus_size) << (bundle.d.bits.source << log_c_size_bus_size)).squeeze
     }
 
     when (bundle.d.valid && d_first && edge.isResponse(bundle.d.bits) && d_release_ack) {

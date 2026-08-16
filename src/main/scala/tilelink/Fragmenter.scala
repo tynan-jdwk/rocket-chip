@@ -15,6 +15,7 @@ import freechips.rocketchip.util.{Repeater, OH1ToUInt, UIntToOH1}
 import scala.math.min
 
 import freechips.rocketchip.util.DataToAugmentedData
+import freechips.rocketchip.util.ConnectableBitsOpExtension
 
 object EarlyAck {
   sealed trait T
@@ -315,7 +316,7 @@ class TLFragmenter(val minSize: Int, val maxSize: Int, val alwaysMin: Boolean = 
         out.a :<>= in_a.squeezeAll
         out.a.bits.address := in_a.bits.address | ~(old_gennum1 << log2Ceil(beatBytes) | ~aOrigOH1 | aFragOH1 | (minSize-1).U)
         out.a.bits.source := Cat(Seq(in_a.bits.source) ++ aFull ++ Seq(aToggle.asUInt, aFragnum))
-        out.a.bits.size :<= aFrag.squeeze
+        out.a.bits.size :%= aFrag
 
         // Optimize away some of the Repeater's registers
         assert (!repeater.io.full || !aHasData)

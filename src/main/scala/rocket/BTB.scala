@@ -261,12 +261,12 @@ class BTB(implicit p: Parameters) extends BtbModule {
     val mask = UIntToOH(waddr, entries)
     idxs(waddr) := r_btb_update.bits.pc(matchBits-1, log2Up(coreInstBytes))
     tgts(waddr) := update_target(matchBits-1, log2Up(coreInstBytes))
-    idxPages(waddr) :<= (idxPageUpdate +& 1.U).squeeze // the +1 corresponds to the <<1 on io.resp.valid
+    idxPages(waddr) :%= (idxPageUpdate +& 1.U) // the +1 corresponds to the <<1 on io.resp.valid
     tgtPages(waddr) := tgtPageUpdate
     cfiType(waddr) := r_btb_update.bits.cfiType
     isValid :<= Mux(r_btb_update.bits.isValid, isValid | mask, isValid & ~mask)
     if (fetchWidth > 1)
-      brIdx(waddr) :<= (r_btb_update.bits.br_pc >> log2Up(coreInstBytes)).squeeze
+      brIdx(waddr) :%= (r_btb_update.bits.br_pc >> log2Up(coreInstBytes))
 
     require(nPages % 2 == 0)
     val idxWritesEven = !idxPageUpdate(0)
@@ -287,7 +287,7 @@ class BTB(implicit p: Parameters) extends BtbModule {
   io.resp.bits.target := Cat(pagesMasked(Mux1H(idxHit, tgtPages)), Mux1H(idxHit, tgts) << log2Up(coreInstBytes))
   io.resp.bits.entry := OHToUInt(idxHit)
   io.resp.bits.bridx := (if (fetchWidth > 1) Mux1H(idxHit, brIdx) else 0.U)
-  io.resp.bits.mask :<= Cat((1.U << ~Mux(io.resp.bits.taken, ~io.resp.bits.bridx, 0.U))-1.U, 1.U).squeeze
+  io.resp.bits.mask :%= Cat((1.U << ~Mux(io.resp.bits.taken, ~io.resp.bits.bridx, 0.U))-1.U, 1.U)
   io.resp.bits.cfiType := Mux1H(idxHit, cfiType)
 
   // if multiple entries for same PC land in BTB, zap them
